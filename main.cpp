@@ -1,4 +1,6 @@
 #include <iostream>
+#include <cmath>
+
 using namespace std;
 
 /*int rows =  sizeof matrix / sizeof matrix[0]; // 2 rows
@@ -13,6 +15,11 @@ void swap_rows(double ** matrix, int rows, int col, int swap1, int swap2){
         matrix[swap2][i] = temp;
     }
 }
+
+double multiply_row(double** matrix, int row_to_scale, int col, double factor){
+    return  matrix[row_to_scale][col] * factor;
+
+}
 void add_rows(double** matrix, int rows, int col, int add1, int add2){
     double factor;
     int col_to_zero=0;
@@ -22,14 +29,10 @@ void add_rows(double** matrix, int rows, int col, int add1, int add2){
             i = col;
         }
     }
-    factor = matrix[add2][col_to_zero]/matrix[add1][col_to_zero];
+    factor = isnan(matrix[add2][col_to_zero]/matrix[add1][col_to_zero]) ? 0 : matrix[add2][col_to_zero]/matrix[add1][col_to_zero] ;
+
     for (int j = 0; j <col ; ++j) {
-        matrix[add2][j] = matrix[add2][j] - matrix[add1][j]*factor;
-    }
-}
-void multiply_row(double** matrix, int row_to_scale, int col, double factor){
-    for (int i = 0; i < col; ++i) {
-        matrix[row_to_scale][i] = matrix[row_to_scale][i] * factor;
+        matrix[add2][j] = matrix[add2][j] - multiply_row(matrix,add1,j,factor);
     }
 }
 void print_matrix(double** matrix, int row, int col){
@@ -61,12 +64,20 @@ void row_echleon(double** matrix, int row, int col){
         }
     }
 }
+void reduce_matrix(double** matrix, int row, int col){
+    double variable[row];
+    for (int i = row-1; i > -1 ; --i) {
+        for (int j = i -1; j > -1 ; --j){
+            add_rows(matrix, row, col, j, i);
+        }
+    }
+}
 int main() {
     cout << "Hello, World!" << endl;
     int col = 4;
     int row = 3;
     double **matrix;
-    double list[row][col] = {{8,9,7,3},{0,0,0,0},{3,6,5,2}};
+    double list[row][col] = {{8,1,2,3},{0,2,2,3},{1,2,5,3}};
 
     matrix = static_cast<double **>(malloc(row * sizeof * matrix));
     for (int i = 0; i < row; ++i) {
